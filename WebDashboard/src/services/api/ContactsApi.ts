@@ -36,7 +36,7 @@ class ContactsApiService {
     });
 
     try {
-      return await apiClient.get(`/api/v1/contacts?${params}`);
+      return await apiClient.get(`/dashboard/contacts?${params}`);
     } catch {
       // Return mock data if backend is not available
       const filteredContacts = this.filterMockContacts(MOCK_CONTACTS, filters);
@@ -82,7 +82,7 @@ class ContactsApiService {
   }
 
   async getContactById(id: string): Promise<ApiResponse<Contact>> {
-    return apiClient.get(`/api/v1/contacts/${id}`);
+    return apiClient.get(`/contacts/${id}`);
   }
 
   async getStats(): Promise<
@@ -94,7 +94,7 @@ class ContactsApiService {
     }>
   > {
     try {
-      return await apiClient.get("/api/v1/contacts/stats");
+      return await apiClient.get("/dashboard/stats");
     } catch {
       // Return mock data if backend is not available
       return createMockApiResponse(MOCK_CONTACT_STATS);
@@ -129,17 +129,17 @@ class ContactsApiService {
   }
 
   async getStates(): Promise<ApiResponse<string[]>> {
-    return apiClient.get("/api/v1/contacts/states");
+    return apiClient.get("/dashboard/states");
   }
 
   async getMunicipalities(state: string): Promise<ApiResponse<string[]>> {
     return apiClient.get(
-      `/api/v1/contacts/municipalities?state=${encodeURIComponent(state)}`
+      `/dashboard/municipalities?state=${encodeURIComponent(state)}`
     );
   }
 
   async getLadas(): Promise<ApiResponse<string[]>> {
-    return apiClient.get("/api/v1/contacts/ladas");
+    return apiClient.get("/dashboard/ladas");
   }
 }
 
