@@ -1,0 +1,692 @@
+# SMS Marketing Platform v2.0 - Professional Architecture
+# Docker Compose configuration for the restructured system
+
+version: "3.8"
+
+services:
+  # =============================================================================
+  # DATABASE SERVICES
+  # =============================================================================
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sms_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sms_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sms_password}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-sms_marketing}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Infrastructure/Database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Infrastructure/Database/postgres.conf:/etc/postgresql/postgresql.conf
+    ports:
+      - "15432:5432"
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c shared_preload_libraries='pg_stat_statements'
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-sms_user} -d ${POSTGRES_DATABASE:-sms_marketing}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sms_redis
+    volumes:
+      - redis_data:/data
+      - ./Infrastructure/Database/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "16379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  mongo:
+    image: mongo:7
+    container_name: sms_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-validations}
+    volumes:
+      - mongo_data:/data/db
+      - ./Infrastructure/Database/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # CORE SERVICES
+  # =============================================================================
+
+  api-gateway:
+    build:
+      context: ./Services/ApiGateway
+      dockerfile: Dockerfile
+    container_name: sms_api_gateway
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8080
+      - API_SECRET_KEY=${API_SECRET_KEY}
+      - DB_POSTGRES_HOST=postgres
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=${POSTGRES_USER:-sms_user}
+      - DB_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRES_DATABASE=${POSTGRES_DATABASE:-sms_marketing}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - DB_MONGODB_HOST=mongo
+      - DB_MONGODB_PORT=27017
+      - DB_MONGODB_USER=${MONGODB_USER:-admin}
+      - DB_MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - DB_MONGODB_DATABASE=${MONGODB_DATABASE:-validations}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MONITORING_METRICS_ENABLED=true
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+      - ./exports:/app/exports
+    ports:
+      - "8080:8080"
+      - "9090:9090" # Prometheus metrics
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  contact-management:
+    build:
+      context: ./Services/ContactManagement
+      dockerfile: Dockerfile
+    container_name: sms_contact_management
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8001
+      - DB_POSTGRES_HOST=postgres
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=${POSTGRES_USER:-sms_user}
+      - DB_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRES_DATABASE=${POSTGRES_DATABASE:-sms_marketing}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+      - ./exports:/app/exports
+    ports:
+      - "8001:8001"
+      - "9091:9090" # Prometheus metrics
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  lead-scoring:
+    build:
+      context: ./Services/LeadScoring
+      dockerfile: Dockerfile
+    container_name: sms_lead_scoring
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8002
+      - DB_POSTGRES_HOST=postgres
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=${POSTGRES_USER:-sms_user}
+      - DB_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRES_DATABASE=${POSTGRES_DATABASE:-sms_marketing}
+      - DB_MONGODB_HOST=mongo
+      - DB_MONGODB_PORT=27017
+      - DB_MONGODB_USER=${MONGODB_USER:-admin}
+      - DB_MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - DB_MONGODB_DATABASE=${MONGODB_DATABASE:-validations}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data # For ML models and training data
+    ports:
+      - "8002:8002"
+      - "9092:9090" # Prometheus metrics
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  validation-orchestrator:
+    build:
+      context: ./Services/ValidationOrchestrator
+      dockerfile: Dockerfile
+    container_name: sms_validation_orchestrator
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8003
+      - DB_POSTGRES_HOST=postgres
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=${POSTGRES_USER:-sms_user}
+      - DB_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRES_DATABASE=${POSTGRES_DATABASE:-sms_marketing}
+      - DB_MONGODB_HOST=mongo
+      - DB_MONGODB_PORT=27017
+      - DB_MONGODB_USER=${MONGODB_USER:-admin}
+      - DB_MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - DB_MONGODB_DATABASE=${MONGODB_DATABASE:-validations}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - VALIDATION_MAX_CONCURRENT_VALIDATIONS=${MAX_CONCURRENT_VALIDATIONS:-20}
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8003:8003"
+      - "9093:9090" # Prometheus metrics
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # PLATFORM VALIDATORS
+  # =============================================================================
+
+  whatsapp-validator:
+    build:
+      context: ./Services/PlatformValidators/WhatsAppValidator
+      dockerfile: Dockerfile
+    container_name: sms_whatsapp_validator
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8011
+      - VALIDATION_WHATSAPP_ENABLED=true
+      - VALIDATION_WHATSAPP_API_KEY=${WHATSAPP_API_KEY}
+      - VALIDATION_WHATSAPP_RATE_LIMIT=${WHATSAPP_RATE_LIMIT:-100}
+      - VALIDATION_WHATSAPP_TIMEOUT=${WHATSAPP_TIMEOUT:-30}
+      - VALIDATION_PROXY_ENABLED=${PROXY_ENABLED:-false}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8011:8011"
+      - "9101:9090" # Prometheus metrics
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    networks:
+      - sms_network
+
+  instagram-validator:
+    build:
+      context: ./Services/PlatformValidators/InstagramValidator
+      dockerfile: Dockerfile
+    container_name: sms_instagram_validator
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8012
+      - VALIDATION_INSTAGRAM_ENABLED=true
+      - VALIDATION_INSTAGRAM_API_KEY=${INSTAGRAM_API_KEY}
+      - VALIDATION_INSTAGRAM_RATE_LIMIT=${INSTAGRAM_RATE_LIMIT:-50}
+      - VALIDATION_INSTAGRAM_TIMEOUT=${INSTAGRAM_TIMEOUT:-30}
+      - VALIDATION_PROXY_ENABLED=${PROXY_ENABLED:-false}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8012:8012"
+      - "9102:9090" # Prometheus metrics
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    networks:
+      - sms_network
+
+  facebook-validator:
+    build:
+      context: ./Services/PlatformValidators/FacebookValidator
+      dockerfile: Dockerfile
+    container_name: sms_facebook_validator
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8013
+      - VALIDATION_FACEBOOK_ENABLED=true
+      - VALIDATION_FACEBOOK_API_KEY=${FACEBOOK_API_KEY}
+      - VALIDATION_FACEBOOK_RATE_LIMIT=${FACEBOOK_RATE_LIMIT:-50}
+      - VALIDATION_FACEBOOK_TIMEOUT=${FACEBOOK_TIMEOUT:-30}
+      - VALIDATION_PROXY_ENABLED=${PROXY_ENABLED:-false}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8013:8013"
+      - "9103:9090" # Prometheus metrics
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    networks:
+      - sms_network
+
+  google-validator:
+    build:
+      context: ./Services/PlatformValidators/GoogleValidator
+      dockerfile: Dockerfile
+    container_name: sms_google_validator
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8014
+      - VALIDATION_GOOGLE_ENABLED=true
+      - VALIDATION_GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - VALIDATION_GOOGLE_RATE_LIMIT=${GOOGLE_RATE_LIMIT:-100}
+      - VALIDATION_GOOGLE_TIMEOUT=${GOOGLE_TIMEOUT:-30}
+      - VALIDATION_PROXY_ENABLED=${PROXY_ENABLED:-false}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8014:8014"
+      - "9104:9090" # Prometheus metrics
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8014/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    networks:
+      - sms_network
+
+  apple-validator:
+    build:
+      context: ./Services/PlatformValidators/AppleValidator
+      dockerfile: Dockerfile
+    container_name: sms_apple_validator
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_HOST=0.0.0.0
+      - API_PORT=8015
+      - VALIDATION_APPLE_ENABLED=true
+      - VALIDATION_APPLE_API_KEY=${APPLE_API_KEY}
+      - VALIDATION_APPLE_RATE_LIMIT=${APPLE_RATE_LIMIT:-50}
+      - VALIDATION_APPLE_TIMEOUT=${APPLE_TIMEOUT:-30}
+      - VALIDATION_PROXY_ENABLED=${PROXY_ENABLED:-false}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8015:8015"
+      - "9105:9090" # Prometheus metrics
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8015/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # WORKER SERVICES
+  # =============================================================================
+
+  celery-worker:
+    build:
+      context: ./Services/ApiGateway
+      dockerfile: Dockerfile.worker
+    container_name: sms_celery_worker
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_WORKER_CONCURRENCY=${CELERY_WORKER_CONCURRENCY:-4}
+      - DB_POSTGRES_HOST=postgres
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=${POSTGRES_USER:-sms_user}
+      - DB_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRES_DATABASE=${POSTGRES_DATABASE:-sms_marketing}
+      - DB_REDIS_HOST=redis
+      - DB_REDIS_PORT=6379
+      - DB_MONGODB_HOST=mongo
+      - DB_MONGODB_PORT=27017
+      - DB_MONGODB_USER=${MONGODB_USER:-admin}
+      - DB_MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - DB_MONGODB_DATABASE=${MONGODB_DATABASE:-validations}
+      - MONITORING_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+      - ./exports:/app/exports
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+    networks:
+      - sms_network
+
+  celery-flower:
+    build:
+      context: ./Services/ApiGateway
+      dockerfile: Dockerfile.worker
+    container_name: sms_celery_flower
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    command: celery -A app.workers.celery_app flower --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # FRONTEND
+  # =============================================================================
+
+  web-dashboard:
+    build:
+      context: ./WebDashboard
+      dockerfile: Dockerfile
+    container_name: sms_web_dashboard
+    environment:
+      - NODE_ENV=${ENVIRONMENT:-production}
+      - REACT_APP_API_URL=http://localhost:8080
+      - REACT_APP_WS_URL=ws://localhost:8080
+      - REACT_APP_VERSION=2.0.0
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # TELEGRAM BOT (Legacy Integration)
+  # =============================================================================
+
+  telegram-bot:
+    build:
+      context: ./Legacy/OLD_2025-01-13/bot
+      dockerfile: Dockerfile
+    container_name: sms_telegram_bot
+    environment:
+      - BOT_DB_HOST=postgres
+      - BOT_DB_PORT=5432
+      - BOT_DB_NAME=${POSTGRES_DATABASE:-sms_marketing}
+      - BOT_DB_USER=${POSTGRES_USER:-sms_user}
+      - BOT_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - BOT_TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - BOT_TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME:-RNumbeRs_bot}
+      - BOT_BOT_ENVIRONMENT=production
+      - BOT_BOT_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - BOT_MAX_EXTRACTION_AMOUNT=${BOT_MAX_EXTRACTION_AMOUNT:-10000}
+      - BOT_MAX_DAILY_EXTRACTIONS=${BOT_MAX_DAILY_EXTRACTIONS:-50000}
+      - BOT_MAX_HOURLY_EXTRACTIONS=${BOT_MAX_HOURLY_EXTRACTIONS:-20}
+      - BOT_ENABLE_RATE_LIMITING=true
+      - BOT_ENABLE_AUDIT_LOG=true
+    volumes:
+      - ./exports:/app/exports
+      - ./logs:/app/logs
+    command: ["python", "telegram_production.py"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # MONITORING & OBSERVABILITY
+  # =============================================================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sms_prometheus
+    volumes:
+      - ./Infrastructure/Monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sms_grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./Infrastructure/Monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./Infrastructure/Monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - sms_network
+
+  # =============================================================================
+  # REVERSE PROXY
+  # =============================================================================
+
+  nginx:
+    image: nginx:alpine
+    container_name: sms_nginx
+    volumes:
+      - ./Infrastructure/Docker/nginx.conf:/etc/nginx/nginx.conf
+      - ./Infrastructure/Docker/ssl:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api-gateway
+      - web-dashboard
+    restart: unless-stopped
+    profiles:
+      - production
+    networks:
+      - sms_network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  mongo_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+
+networks:
+  sms_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

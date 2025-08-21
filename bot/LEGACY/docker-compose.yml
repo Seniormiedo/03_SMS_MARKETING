@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: sms_db
+    environment:
+      POSTGRES_USER: sms_user
+      POSTGRES_PASSWORD: sms_password
+      POSTGRES_DB: sms_marketing
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./docs/db/ESTRUCTURA_SQL_COMPLETA.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sms_user -d sms_marketing"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  bot-cli:
+    build: .
+    container_name: sms_bot_cli
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      BOT_DB_HOST: db
+      BOT_DB_PORT: 5432
+      BOT_DB_NAME: sms_marketing
+      BOT_DB_USER: sms_user
+      BOT_DB_PASSWORD: sms_password
+      BOT_BOT_ENVIRONMENT: development
+      BOT_BOT_LOG_LEVEL: INFO
+      BOT_EXPORT_PATH: /app/exports
+      BOT_LOG_PATH: /app/logs
+      BOT_TELEGRAM_BOT_TOKEN: "dummy-token"
+    volumes:
+      - ./:/app
+    tty: true
+    stdin_open: true
+    command: ["python", "main.py", "--interactive"]
+
+volumes:
+  db_data:
+
+

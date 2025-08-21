@@ -1,0 +1,73 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+# === GENERALES =====================================================
+.git/                 # repo metadata
+.vscode/              # settings de editor
+.idea/                # JetBrains
+*.log                 # logs varios
+*.tmp
+*.swp                 # swap de vim/editores
+.DS_Store
+Thumbs.db
+Legacy/
+
+# === PYTHON ========================================================
+__pycache__/
+*.py[cod]             # bytecode
+*.so                  # extensiones C compiladas
+.venv/                # entornos virtuales
+venv/
+env/
+pip-wheel-metadata/
+.build/               # pex/pyinstaller artefacts
+dist/
+build/
+*.egg-info/
+.eggs/
+.tox/
+.mypy_cache/
+.pytest_cache/
+.coverage*
+htmlcov/
+.coverage/            # pauta de cobertura
+*.sqlite3             # bases de prueba
+
+# === NODE / TS / REACT ============================================
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+dist/
+build/
+coverage/
+.nyc_output/
+.next/                # Next.js
+.nuxt/                # Nuxt
+.out/                 # SvelteKit
+.turbo/
+.parcel-cache/
+.eslintcache
+.vercel/
+.cache/               # Babel / Webpack
+.storybook-static/
+.cypress/
+playwright-report/
+expo/
+.expo/ 
+.expo-shared/
+
+# === DOCKER / CONTENEDORES ========================================
+.docker/
+docker-compose.override.yml   # config local
+**/tmp/                       # directorios temporales creados por contenedores
+
+# === OTROS STACKS / HERRAMIENTAS ==================================
+*.iml                 # IntelliJ
+*.suo                 # VS legacy
+*.ipr
+*.iws
+*.class               # bytecode Java
+*.jar
+*.war
+*.har
+
+# FIN

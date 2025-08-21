@@ -1,0 +1,31 @@
+#,Municipio,Estado,ICPTH_2022,LADA,UCT,hora_recomendada,pib
+1,Benito Juárez,Ciudad de México,161535,55,UTC-6,11 h – 13 h o 17 h – 19 h,161535
+2,San Pedro Garza García,Nuevo León,140000,81,UTC-6,11 h – 13 h o 17 h – 19 h,140000
+3,Miguel Hidalgo,Ciudad de México,145000,55,UTC-6,11 h – 13 h o 17 h – 19 h,145000
+4,Cuauhtémoc,Ciudad de México,130000,55,UTC-6,11 h – 13 h o 17 h – 19 h,130000
+5,Álvaro Obregón,Ciudad de México,120000,55,UTC-6,11 h – 13 h o 17 h – 19 h,120000
+6,San Nicolás de los Garza,Nuevo León,115000,81,UTC-6,11 h – 13 h o 17 h – 19 h,115000
+7,Apodaca,Nuevo León,110000,81,UTC-6,11 h – 13 h o 17 h – 19 h,110000
+8,Parás,Nuevo León,108000,824,UTC-6,11 h – 13 h o 17 h – 19 h,108000
+9,Hermosillo,Sonora,105000,662,UTC-7,12 h – 14 h o 18 h – 20 h,105000
+10,Saltillo,Coahuila,87964,844,UTC-6,11 h – 13 h o 17 h – 19 h,87964
+11,Piedras Negras,Coahuila,86000,878,UTC-6,11 h – 13 h o 17 h – 19 h,86000
+12,Torreón,Coahuila,85000,871,UTC-6,11 h – 13 h o 17 h – 19 h,85000
+13,Ramos Arizpe,Coahuila,82000,844,UTC-6,11 h – 13 h o 17 h – 19 h,82000
+14,Monclova,Coahuila,80000,866,UTC-6,11 h – 13 h o 17 h – 19 h,80000
+15,La Paz,Baja California Sur,80000,612,UTC-7,12 h – 14 h o 18 h – 20 h,80000
+16,Los Cabos,Baja California Sur,79000,624,UTC-7,12 h – 14 h o 18 h – 20 h,79000
+17,Mexicali,Baja California,78000,686,UTC-7,12 h – 14 h o 18 h – 20 h,78000
+18,Tijuana,Baja California,77000,664,UTC-7,12 h – 14 h o 18 h – 20 h,77000
+19,Ensenada,Baja California,76000,646,UTC-7,12 h – 14 h o 18 h – 20 h,76000
+20,Ahome (Los Mochis),Sinaloa,76000,668,UTC-7,12 h – 14 h o 18 h – 20 h,76000
+21,Culiacán,Sinaloa,75500,667,UTC-7,12 h – 14 h o 18 h – 20 h,75500
+22,Mazatlán,Sinaloa,75200,669,UTC-7,12 h – 14 h o 18 h – 20 h,75200
+23,Juárez,Chihuahua,75000,656,UTC-6,11 h – 13 h o 17 h – 19 h,75000
+24,Chihuahua (capital),Chihuahua,74500,614,UTC-6,11 h – 13 h o 17 h – 19 h,74500
+25,Delicias,Chihuahua,74000,639,UTC-6,11 h – 13 h o 17 h – 19 h,74000
+26,San José del Cabo,Baja California Sur,73500,624,UTC-7,12 h – 14 h o 18 h – 20 h,73500
+27,Corregidora,Querétaro,73000,442,UTC-6,11 h – 13 h o 17 h – 19 h,73000
+28,Huepac,Sonora,72000,623,UTC-7,12 h – 14 h o 18 h – 20 h,72000
+29,Riva Palacio,Chihuahua,71500,614,UTC-6,11 h – 13 h o 17 h – 19 h,71500
+30,Nava,Coahuila,71000,862,UTC-6,11 h – 13 h o 17 h – 19 h,71000

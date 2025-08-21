@@ -1,0 +1,48 @@
+# Bot Service - Se conecta al stack SMS Marketing existente
+services:
+  # SMS Marketing Bot Service (conecta al PostgreSQL existente)
+  bot:
+    build: .
+    container_name: sms_bot
+    environment:
+      # Database Configuration - CONECTA AL SERVICIO EXISTENTE
+      BOT_DB_HOST: postgres  # Nombre del servicio en tu stack existente
+      BOT_DB_PORT: 5432      # Puerto interno del contenedor postgres
+      BOT_DB_NAME: ${POSTGRES_DB:-sms_marketing}
+      BOT_DB_USER: ${POSTGRES_USER:-sms_user}
+      BOT_DB_PASSWORD: ${POSTGRES_PASSWORD:-sms_password}
+      
+      # Bot Configuration
+      BOT_BOT_ENVIRONMENT: production
+      BOT_BOT_LOG_LEVEL: INFO
+      BOT_TELEGRAM_BOT_TOKEN: ${BOT_TELEGRAM_BOT_TOKEN}
+      BOT_TELEGRAM_BOT_USERNAME: ${BOT_TELEGRAM_BOT_USERNAME:-RNumbeRs_bot}
+      
+      # Paths
+      BOT_EXPORT_PATH: /app/exports
+      BOT_LOG_PATH: /app/logs
+      
+      # Limits
+      BOT_MAX_EXTRACTION_AMOUNT: 10000
+      BOT_MAX_DAILY_EXTRACTIONS: 50000
+      BOT_MAX_HOURLY_EXTRACTIONS: 20
+      
+      # Features
+      BOT_ENABLE_RATE_LIMITING: true
+      BOT_ENABLE_AUDIT_LOG: true
+    volumes:
+      - ./:/app
+      - ./exports:/app/exports
+      - ./logs:/app/logs
+    command: ["python", "telegram_production.py"]
+    restart: unless-stopped
+    networks:
+      - sms_marketing_network
+
+# Usar la red existente del stack SMS Marketing
+networks:
+  sms_marketing_network:
+    external: true
+    name: sms_marketing_network
+
+

@@ -1,0 +1,74 @@
+<svg width="1100" height="720" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .box { fill:#f7f9fc; stroke:#1f4b99; stroke-width:2; rx:8; }
+    .title { font: 600 16px sans-serif; fill:#0b2e6b; }
+    .text { font: 12px sans-serif; fill:#1b1e23; }
+    .group { fill:#eef3fb; stroke:#7393d9; stroke-width:1.5; rx:10; }
+    .arrow { stroke:#333; stroke-width:1.5; marker-end:url(#arrow); fill:none; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Usuarios / Entradas -->
+  <rect x="30" y="40" width="240" height="140" class="group"/>
+  <text x="40" y="60" class="title">Interfaces de Usuario</text>
+  <rect x="50" y="80" width="200" height="35" class="box"/><text x="60" y="102" class="text">CLI / Servicio (main.py)</text>
+  <rect x="50" y="120" width="200" height="35" class="box"/><text x="60" y="142" class="text">Telegram (telegram_main.py)</text>
+  <rect x="50" y="160" width="200" height="35" class="box"/><text x="60" y="182" class="text">Telegram Demo / Producción</text>
+
+  <!-- Core -->
+  <rect x="320" y="40" width="330" height="200" class="group"/>
+  <text x="330" y="60" class="title">Core</text>
+  <rect x="340" y="80" width="290" height="40" class="box"/><text x="350" y="105" class="text">Validaciones (core/validators.py)</text>
+  <rect x="340" y="130" width="290" height="40" class="box"/><text x="350" y="155" class="text">Base de Datos (core/database.py)</text>
+  <rect x="340" y="180" width="290" height="40" class="box"/><text x="350" y="205" class="text">Telegram Bot (core/telegram_bot.py)</text>
+
+  <!-- Servicios -->
+  <rect x="700" y="40" width="350" height="200" class="group"/>
+  <text x="710" y="60" class="title">Servicios de Dominio</text>
+  <rect x="720" y="80" width="310" height="40" class="box"/><text x="730" y="105" class="text">ContactService (extracción real)</text>
+  <rect x="720" y="130" width="310" height="40" class="box"/><text x="730" y="155" class="text">ExportService (XLSX/TXT)</text>
+  <rect x="720" y="180" width="310" height="40" class="box"/><text x="730" y="205" class="text">Limpieza y métricas</text>
+
+  <!-- Modelos -->
+  <rect x="320" y="270" width="330" height="120" class="group"/>
+  <text x="330" y="290" class="title">Modelos</text>
+  <rect x="340" y="310" width="290" height="35" class="box"/><text x="350" y="332" class="text">Contact (models/contact.py)</text>
+  <rect x="340" y="350" width="290" height="35" class="box"/><text x="350" y="372" class="text">Extraction* (models/extraction.py)</text>
+
+  <!-- Utilidades -->
+  <rect x="700" y="270" width="350" height="120" class="group"/>
+  <text x="710" y="290" class="title">Utilidades</text>
+  <rect x="720" y="310" width="310" height="35" class="box"/><text x="730" y="332" class="text">Logger (utils/logger.py)</text>
+  <rect x="720" y="350" width="310" height="35" class="box"/><text x="730" y="372" class="text">Formatters (utils/formatters.py)</text>
+
+  <!-- Config -->
+  <rect x="30" y="240" width="240" height="150" class="group"/>
+  <text x="40" y="260" class="title">Configuración</text>
+  <rect x="50" y="280" width="200" height="40" class="box"/><text x="60" y="305" class="text">BotConfig (config.py)</text>
+  <rect x="50" y="330" width="200" height="40" class="box"/><text x="60" y="355" class="text">.env (prefijo BOT_)</text>
+
+  <!-- Salidas -->
+  <rect x="30" y="430" width="240" height="170" class="group"/>
+  <text x="40" y="450" class="title">Salidas</text>
+  <rect x="50" y="470" width="200" height="35" class="box"/><text x="60" y="492" class="text">exports/ (archivos)</text>
+  <rect x="50" y="510" width="200" height="35" class="box"/><text x="60" y="532" class="text">logs/ y audit logs</text>
+  <rect x="50" y="550" width="200" height="35" class="box"/><text x="60" y="572" class="text">Entrega Telegram/CLI</text>
+
+  <!-- Flechas -->
+  <line x1="270" y1="110" x2="320" y2="110" class="arrow"/>
+  <line x1="270" y1="150" x2="320" y2="150" class="arrow"/>
+  <line x1="650" y1="150" x2="700" y2="150" class="arrow"/>
+  <line x1="485" y1="240" x2="485" y2="270" class="arrow"/>
+  <line x1="875" y1="240" x2="875" y2="270" class="arrow"/>
+  <line x1="270" y1="320" x2="320" y2="320" class="arrow"/>
+  <line x1="270" y1="360" x2="320" y2="360" class="arrow"/>
+  <line x1="700" y1="380" x2="270" y2="488" class="arrow"/>
+  <line x1="700" y1="380" x2="270" y2="528" class="arrow"/>
+
+  <!-- Pie -->
+  <text x="30" y="690" class="text">DB: PostgreSQL 16 • Volumen referencial: 31.8M+ • Índices optimizados • Auditoría activada</text>
+</svg>

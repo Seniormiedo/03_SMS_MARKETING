@@ -1,0 +1,59 @@
+# ==============================================
+# CONTACT EXTRACTOR BOT - DEPENDENCIAS
+# ==============================================
+
+# Base de Datos
+asyncpg==0.29.0              # Cliente PostgreSQL asíncrono optimizado
+psycopg2-binary==2.9.9       # Cliente PostgreSQL tradicional (backup)
+SQLAlchemy==2.0.23            # ORM para consultas complejas
+
+# Exportación de Archivos
+openpyxl==3.1.2              # Generación de archivos Excel (.xlsx)
+xlsxwriter==3.1.9            # Alternativa para Excel con mejor performance
+
+# Configuración y Variables de Entorno
+python-dotenv==1.0.0         # Carga de archivos .env
+pydantic==2.5.2              # Validación de datos y configuración
+pydantic-settings==2.1.0     # Configuración con Pydantic
+
+# Utilidades de Fecha y Tiempo
+python-dateutil==2.8.2       # Manejo avanzado de fechas
+pytz==2023.3                 # Zonas horarias
+
+# Logging y Monitoreo
+structlog==23.2.0            # Logging estructurado profesional
+rich==13.7.0                 # Output colorido y mejorado en consola
+
+# Validaciones y Formateo
+phonenumbers==8.13.26        # Validación y formateo de números telefónicos
+validators==0.22.0           # Validaciones generales
+
+# Procesamiento Asíncrono
+asyncio==3.4.3               # Programación asíncrona
+aiofiles==23.2.1             # Manejo asíncrono de archivos
+
+# Telegram Bot
+python-telegram-bot==20.7    # Telegram Bot API wrapper
+telegram==0.0.1              # Telegram utilities
+
+# Utilidades Generales
+click==8.1.7                 # CLI interface (para comandos de consola)
+tqdm==4.66.1                 # Barras de progreso
+pathlib2==2.3.7             # Manejo mejorado de rutas
+psutil==5.9.6                # Información del sistema y procesos
+
+# Testing (Desarrollo)
+pytest==7.4.3               # Framework de testing
+pytest-asyncio==0.21.1      # Testing asíncrono
+pytest-cov==4.1.0           # Cobertura de tests
+faker==20.1.0                # Generación de datos fake para tests
+
+# Desarrollo y Calidad de Código
+black==23.11.0               # Formateo de código
+isort==5.12.0                # Ordenamiento de imports
+flake8==6.1.0                # Linting
+mypy==1.7.1                  # Type checking
+
+# Seguridad
+cryptography==41.0.7        # Funciones criptográficas
+bcrypt==4.1.2                # Hashing seguro
