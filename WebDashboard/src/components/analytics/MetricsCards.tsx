@@ -5,6 +5,7 @@ import {
     UsersIcon,
 } from "@heroicons/react/24/outline";
 import React from "react";
+import { Icon } from "../common/Icon";
 
 interface MetricsCardsProps {
   stats: {
@@ -85,7 +86,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({ stats }) => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className={`p-2 sm:p-3 rounded-lg ${getColorClasses(metric.color)}`}>
-                  <metric.icon className="heroicon h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" style={{width: '1.5rem', height: '1.5rem'}} />
+                  <Icon icon={metric.icon} size="md" aria-hidden="true" />
                 </div>
               </div>
               <div className="ml-3 sm:ml-5 w-0 flex-1">

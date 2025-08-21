@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useAppDispatch } from "../../hooks/redux";
 import { fetchContactStats } from "../../store/slices/contactsSlice";
+import { Icon } from "./Icon";
 import { LoadingSpinner } from "./LoadingSpinner";
 
 export const QuickActions: React.FC = () => {
@@ -42,7 +43,7 @@ export const QuickActions: React.FC = () => {
         onClick={handleNewExtraction}
         className="btn-primary"
       >
-        <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+        <Icon icon={PlusIcon} size="sm" className="-ml-1 mr-2" aria-hidden="true" />
         New Extraction
       </button>
 
@@ -55,7 +56,7 @@ export const QuickActions: React.FC = () => {
         {isRefreshing ? (
           <LoadingSpinner size="sm" className="mr-2" />
         ) : (
-          <ArrowPathIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+          <Icon icon={ArrowPathIcon} size="sm" className="-ml-1 mr-2" aria-hidden="true" />
         )}
         {isRefreshing ? "Refreshing..." : "Refresh"}
       </button>
@@ -66,7 +67,7 @@ export const QuickActions: React.FC = () => {
           onClick={() => setShowDropdown(!showDropdown)}
           className="btn-secondary"
         >
-          <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+          <Icon icon={EllipsisVerticalIcon} size="sm" aria-hidden="true" />
         </button>
 
         {showDropdown && (
@@ -76,7 +77,7 @@ export const QuickActions: React.FC = () => {
                 onClick={handleExportData}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                <ArrowDownTrayIcon className="mr-3 h-4 w-4" />
+                <Icon icon={ArrowDownTrayIcon} size="sm" className="mr-3" />
                 Export Data
               </button>
               <button

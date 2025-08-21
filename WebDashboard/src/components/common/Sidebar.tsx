@@ -9,6 +9,7 @@ import {
 import { clsx } from "clsx";
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { Icon } from "./Icon";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -47,12 +48,14 @@ export const Sidebar: React.FC = () => {
               >
                 {({ isActive }) => (
                   <>
-                    <item.icon
+                    <Icon
+                      icon={item.icon}
+                      size="md"
                       className={clsx(
                         isActive
                           ? "text-white"
                           : "text-gray-400 group-hover:text-gray-300",
-                        "mr-3 flex-shrink-0 h-6 w-6"
+                        "mr-3 flex-shrink-0"
                       )}
                       aria-hidden="true"
                     />

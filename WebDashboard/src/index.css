@@ -42,62 +42,34 @@
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
+}
 
-        /* AGGRESSIVE ICON SIZE CONTROL - Prevent giant icons */
-  svg {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    max-width: 1.5rem !important;
-    max-height: 1.5rem !important;
-    min-width: 1rem !important;
-    min-height: 1rem !important;
-    flex-shrink: 0 !important;
-    display: inline-block !important;
-  }
+    /* CRITICAL ICON FIX - Outside layers for maximum specificity */
+svg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  max-width: 1.5rem !important;
+  max-height: 1.5rem !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
 
-  /* Force specific icon classes */
-  .h-4, .w-4 { width: 1rem !important; height: 1rem !important; }
-  .h-5, .w-5 { width: 1.25rem !important; height: 1.25rem !important; }
-  .h-6, .w-6 { width: 1.5rem !important; height: 1.5rem !important; }
-  .h-8, .w-8 { width: 2rem !important; height: 2rem !important; }
+/* Exception for charts */
+.chart-container svg,
+.chart-container canvas,
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
 
-  /* Target Heroicons specifically */
-  svg[data-slot="icon"],
-  svg[aria-hidden="true"],
-  .heroicon {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    max-width: 1.5rem !important;
-    max-height: 1.5rem !important;
-    flex: none !important;
-  }
-
-  /* Prevent flex expansion of icons */
-  .flex-shrink-0 svg {
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    flex-basis: auto !important;
-  }
-
-    /* Chart container fixes - EXCEPTION for charts */
-  .chart-container {
-    position: relative;
-    height: 20rem;
-    width: 100%;
-  }
-
-  .chart-container canvas {
-    max-height: 20rem !important;
-  }
-
-  /* Allow charts to be full size */
-  .chart-container svg,
-  canvas {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-  }
+/* Chart container */
+.chart-container {
+  position: relative;
+  height: 20rem;
+  width: 100%;
+}
 
   @keyframes fadeIn {
     from { opacity: 0; }

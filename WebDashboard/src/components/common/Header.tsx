@@ -6,6 +6,7 @@ import {
 import React from "react";
 import { useAppSelector } from "../../hooks/redux";
 import { MobileSidebar } from "./MobileSidebar";
+import { Icon } from "./Icon";
 
 export const Header: React.FC = () => {
   const stats = useAppSelector((state) => state.contacts?.stats);
@@ -29,15 +30,15 @@ export const Header: React.FC = () => {
             <MobileSidebar />
 
             <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
-              <BellIcon className="heroicon h-5 w-5 sm:h-6 sm:w-6" style={{width: '1.25rem', height: '1.25rem'}} />
+              <Icon icon={BellIcon} size="md" />
             </button>
 
             <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
-              <Cog6ToothIcon className="heroicon h-6 w-6" style={{width: '1.5rem', height: '1.5rem'}} />
+              <Icon icon={Cog6ToothIcon} size="md" />
             </button>
 
             <div className="flex items-center space-x-2">
-              <UserCircleIcon className="heroicon h-8 w-8 text-gray-400" style={{width: '2rem', height: '2rem'}} />
+              <Icon icon={UserCircleIcon} size="lg" className="text-gray-400" />
               <span className="text-sm font-medium text-gray-700">
                 Admin User
               </span>

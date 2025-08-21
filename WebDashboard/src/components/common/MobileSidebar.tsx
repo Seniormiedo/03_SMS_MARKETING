@@ -11,6 +11,7 @@ import {
 import { clsx } from "clsx";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Icon } from "./Icon";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -32,7 +33,7 @@ export const MobileSidebar: React.FC = () => {
           onClick={() => setIsOpen(true)}
           className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <Bars3Icon className="h-6 w-6" />
+                    <Icon icon={Bars3Icon} size="md" className="" />
         </button>
       </div>
 
@@ -80,12 +81,14 @@ export const MobileSidebar: React.FC = () => {
                   >
                     {({ isActive }) => (
                       <>
-                        <item.icon
+                        <Icon
+                          icon={item.icon}
+                          size="md"
                           className={clsx(
                             isActive
                               ? "text-white"
                               : "text-gray-400 group-hover:text-gray-300",
-                            "mr-4 flex-shrink-0 h-6 w-6"
+                            "mr-4 flex-shrink-0"
                           )}
                           aria-hidden="true"
                         />
