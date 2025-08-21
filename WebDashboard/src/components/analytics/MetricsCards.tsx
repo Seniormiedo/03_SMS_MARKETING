@@ -16,10 +16,18 @@ interface MetricsCardsProps {
 }
 
 export const MetricsCards: React.FC<MetricsCardsProps> = ({ stats }) => {
+  // Provide default values if stats is undefined
+  const safeStats = stats || {
+    totalContacts: 0,
+    contactsByState: {},
+    contactsByLada: {},
+    recentExtractions: 0,
+  };
+
   const metrics = [
     {
       name: "Total Contacts",
-      value: stats.totalContacts.toLocaleString(),
+      value: safeStats.totalContacts.toLocaleString(),
       icon: UsersIcon,
       change: "+2.5%",
       changeType: "increase" as const,
@@ -28,7 +36,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({ stats }) => {
     },
     {
       name: "States Covered",
-      value: Object.keys(stats.contactsByState).length.toString(),
+      value: Object.keys(safeStats.contactsByState).length.toString(),
       icon: DocumentTextIcon,
       change: "+1",
       changeType: "increase" as const,
@@ -37,7 +45,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({ stats }) => {
     },
     {
       name: "Recent Extractions",
-      value: stats.recentExtractions.toString(),
+      value: safeStats.recentExtractions.toString(),
       icon: CheckCircleIcon,
       change: "+12%",
       changeType: "increase" as const,
@@ -77,7 +85,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({ stats }) => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className={`p-2 sm:p-3 rounded-lg ${getColorClasses(metric.color)}`}>
-                  <metric.icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+                  <metric.icon className="heroicon h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" style={{width: '1.5rem', height: '1.5rem'}} />
                 </div>
               </div>
               <div className="ml-3 sm:ml-5 w-0 flex-1">

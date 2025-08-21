@@ -18,9 +18,17 @@ interface ChartsGridProps {
 }
 
 export const ChartsGrid: React.FC<ChartsGridProps> = ({ stats }) => {
+  // Provide default values if stats is undefined
+  const safeStats = stats || {
+    totalContacts: 0,
+    contactsByState: {},
+    contactsByLada: {},
+    recentExtractions: 0,
+  };
+
   // Process data for charts
-  const stateData = processStateData(stats.contactsByState);
-  const ladaData = processLadaData(stats.contactsByLada);
+  const stateData = processStateData(safeStats.contactsByState);
+  const ladaData = processLadaData(safeStats.contactsByLada);
   const growthData = generateMockGrowthData();
 
   // Contacts by State Chart Data
@@ -62,7 +70,7 @@ export const ChartsGrid: React.FC<ChartsGridProps> = ({ stats }) => {
             {stateData.data.reduce((a, b) => a + b, 0).toLocaleString()} total
           </div>
         </div>
-        <div className="h-80">
+        <div className="chart-container h-80">
           <Bar data={stateChartData} options={DEFAULT_CHART_OPTIONS} />
         </div>
       </div>
@@ -77,7 +85,7 @@ export const ChartsGrid: React.FC<ChartsGridProps> = ({ stats }) => {
             {ladaData.data.reduce((a, b) => a + b, 0).toLocaleString()} contacts
           </div>
         </div>
-        <div className="h-80">
+        <div className="chart-container h-80">
           <Doughnut data={ladaChartData} options={DOUGHNUT_OPTIONS} />
         </div>
       </div>
@@ -99,7 +107,7 @@ export const ChartsGrid: React.FC<ChartsGridProps> = ({ stats }) => {
             </div>
           </div>
         </div>
-        <div className="h-80">
+        <div className="chart-container h-80">
           <Line data={growthData} options={DEFAULT_CHART_OPTIONS} />
         </div>
       </div>
