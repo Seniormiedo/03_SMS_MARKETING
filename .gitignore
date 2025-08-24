@@ -119,3 +119,7 @@ alembic.ini.bak
 # Exclude problematic directories
 InstagramValidator - copia/
 Legacy/OLD_*/
+# Archivos de backup grandes
+backups/**/*.sql
+**/*.sql
+*.sql
