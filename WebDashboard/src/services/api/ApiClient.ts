@@ -5,7 +5,7 @@ import type { ApiError, ApiResponse } from "../../types/Api";
 class ApiClient {
   private client: AxiosInstance;
 
-  constructor(baseURL: string = "http://localhost:8000") {
+  constructor(baseURL: string = "http://localhost:8000/api/v1") {
     this.client = axios.create({
       baseURL,
       timeout: 10000,

@@ -3,9 +3,10 @@ Contact Schemas
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime
 from enum import Enum
+import math
 
 class ContactStatusEnum(str, Enum):
     """Contact status for API responses"""
@@ -68,7 +69,7 @@ class ContactResponse(ContactBase):
     source: str = "UNKNOWN"
     created_at: datetime
     updated_at: datetime
-    
+
     # Computed properties
     is_contactable: bool = False
     needs_validation: bool = False
@@ -119,3 +120,31 @@ class ContactValidation(BaseModel):
     status: ContactStatusEnum
     validation_source: str
     error_message: Optional[str] = None
+
+# NEW SCHEMAS FOR DASHBOARD
+class PaginatedContactResponse(BaseModel):
+    """Paginated contacts response for dashboard"""
+    data: List[ContactResponse]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+class ContactStatsEnhanced(BaseModel):
+    """Enhanced contacts statistics for dashboard"""
+    total_contacts: int
+    active_contacts: int
+    mobile_contacts: int
+    contacts_by_state: Dict[str, int]
+    contacts_by_lada: Dict[str, int]
+    recent_extractions: int
+    growth_rate: float = 0.0
+
+class ContactFilters(BaseModel):
+    """Contact filters for dashboard"""
+    search_query: Optional[str] = None
+    state: Optional[str] = None
+    municipality: Optional[str] = None
+    lada: Optional[str] = None
+    date_start: Optional[str] = None
+    date_end: Optional[str] = None

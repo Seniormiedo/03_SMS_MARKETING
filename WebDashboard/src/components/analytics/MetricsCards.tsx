@@ -1,10 +1,11 @@
 import {
-    CheckCircleIcon,
-    ClockIcon,
-    DocumentTextIcon,
-    UsersIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import React from "react";
+import { Icon } from "../common/Icon";
 
 interface MetricsCardsProps {
   stats: {
@@ -16,100 +17,120 @@ interface MetricsCardsProps {
 }
 
 export const MetricsCards: React.FC<MetricsCardsProps> = ({ stats }) => {
+  // Provide default values if stats is undefined
+  const safeStats = stats || {
+    totalContacts: 0,
+    contactsByState: {},
+    contactsByLada: {},
+    recentExtractions: 0,
+  };
+
   const metrics = [
     {
-      name: "Total Contacts",
-      value: stats.totalContacts.toLocaleString(),
+      name: "Total Contactos",
+      value: safeStats.totalContacts.toLocaleString(),
       icon: UsersIcon,
       change: "+2.5%",
       changeType: "increase" as const,
-      description: "from last month",
+      description: "este mes",
       color: "blue",
+      bgGradient: "from-blue-500/20 to-cyan-500/20",
+      iconBg: "bg-blue-500/20",
+      iconColor: "text-blue-300",
     },
     {
-      name: "States Covered",
-      value: Object.keys(stats.contactsByState).length.toString(),
+      name: "Estados Cubiertos",
+      value: Object.keys(safeStats.contactsByState).length.toString(),
       icon: DocumentTextIcon,
       change: "+1",
       changeType: "increase" as const,
-      description: "new state added",
+      description: "nuevo estado",
       color: "green",
+      bgGradient: "from-emerald-500/20 to-green-500/20",
+      iconBg: "bg-emerald-500/20",
+      iconColor: "text-emerald-300",
     },
     {
-      name: "Recent Extractions",
-      value: stats.recentExtractions.toString(),
+      name: "Extracciones Recientes",
+      value: safeStats.recentExtractions.toString(),
       icon: CheckCircleIcon,
       change: "+12%",
       changeType: "increase" as const,
-      description: "from last week",
+      description: "esta semana",
       color: "purple",
+      bgGradient: "from-purple-500/20 to-pink-500/20",
+      iconBg: "bg-purple-500/20",
+      iconColor: "text-purple-300",
     },
     {
-      name: "Validation Rate",
+      name: "Tasa de Validación",
       value: "94.2%",
       icon: ClockIcon,
       change: "+0.8%",
       changeType: "increase" as const,
-      description: "accuracy improved",
+      description: "precisión mejorada",
       color: "orange",
+      bgGradient: "from-amber-500/20 to-orange-500/20",
+      iconBg: "bg-amber-500/20",
+      iconColor: "text-amber-300",
     },
   ];
 
-  const getColorClasses = (color: string) => {
-    const colorMap = {
-      blue: "bg-blue-50 text-blue-600",
-      green: "bg-green-50 text-green-600",
-      purple: "bg-purple-50 text-purple-600",
-      orange: "bg-orange-50 text-orange-600",
-    };
-    return colorMap[color as keyof typeof colorMap] || "bg-gray-50 text-gray-600";
-  };
-
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <>
       {metrics.map((metric, index) => (
         <div
           key={metric.name}
-          className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow cursor-pointer animate-slide-up"
+          className="relative group cursor-pointer animate-slide-up"
           style={{ animationDelay: `${index * 100}ms` }}
         >
-          <div className="p-3 sm:p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className={`p-2 sm:p-3 rounded-lg ${getColorClasses(metric.color)}`}>
-                  <metric.icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-                </div>
+          {/* Card with Glass Morphism Effect */}
+          <div className={`bg-gradient-to-br ${metric.bgGradient} backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105`}>
+
+            {/* Icon and Title */}
+            <div className="flex items-center justify-between mb-4">
+              <div className={`flex items-center justify-center w-12 h-12 ${metric.iconBg} rounded-xl ring-2 ring-white/10`}>
+                <Icon icon={metric.icon} size="md" className={`${metric.iconColor}`} />
               </div>
-              <div className="ml-3 sm:ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
-                    {metric.name}
-                  </dt>
-                  <dd>
-                    <div className="text-lg sm:text-2xl font-bold text-gray-900">
-                      {metric.value}
-                    </div>
-                  </dd>
-                </dl>
+
+              {/* Live indicator */}
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-emerald-300 font-medium">Live</span>
               </div>
             </div>
-          </div>
-          <div className="bg-gray-50 px-3 py-2 sm:px-5 sm:py-3">
-            <div className="text-sm">
-              <span
-                className={`font-medium ${
-                  metric.changeType === "increase"
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {metric.change}
-              </span>
-              <span className="text-gray-500"> {metric.description}</span>
+
+            {/* Value */}
+            <div className="mb-3">
+              <h3 className="text-sm font-medium text-slate-300 mb-1">
+                {metric.name}
+              </h3>
+              <p className="text-3xl font-bold text-white">
+                {metric.value}
+              </p>
             </div>
+
+            {/* Change indicator */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                    metric.changeType === "increase"
+                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                      : "bg-red-500/20 text-red-300 border border-red-500/30"
+                  }`}
+                >
+                  {metric.change}
+                </span>
+                <span className="text-xs text-slate-400">{metric.description}</span>
+              </div>
+            </div>
+
+            {/* Hover glow effect */}
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 blur-xl -z-10"></div>
           </div>
         </div>
       ))}
-    </div>
+    </>
   );
 };

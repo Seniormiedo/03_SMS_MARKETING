@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 import redis.asyncio as redis
+from datetime import datetime
 
 from app.core.database import get_db
 from app.core.config import settings
@@ -18,7 +19,19 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "sms-marketing-platform",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "timestamp": datetime.utcnow()
+    }
+
+@router.get("/dashboard")
+async def dashboard_health_check():
+    """Health check específico para dashboard (sin autenticación)"""
+    return {
+        "status": "healthy",
+        "service": "sms-marketing-platform",
+        "version": "1.0.0",
+        "dashboard_ready": True,
+        "timestamp": datetime.utcnow()
     }
 
 @router.get("/detailed")
@@ -30,7 +43,7 @@ async def detailed_health_check(db: AsyncSession = Depends(get_db)):
         "version": "1.0.0",
         "checks": {}
     }
-    
+
     # Check database connection
     try:
         result = await db.execute(text("SELECT 1"))
@@ -44,7 +57,7 @@ async def detailed_health_check(db: AsyncSession = Depends(get_db)):
             "status": "unhealthy",
             "message": f"Database connection failed: {str(e)}"
         }
-    
+
     # Check Redis connection
     try:
         redis_client = redis.from_url(settings.REDIS_URL)
@@ -60,5 +73,5 @@ async def detailed_health_check(db: AsyncSession = Depends(get_db)):
             "status": "unhealthy",
             "message": f"Redis connection failed: {str(e)}"
         }
-    
+
     return health_status
