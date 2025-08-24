@@ -18,13 +18,13 @@ const mockStats = {
 };
 
 describe("MetricsCards", () => {
-  it("renders all metric cards", () => {
+  it("renders all metric cards with Spanish labels", () => {
     render(<MetricsCards stats={mockStats} />);
 
-    expect(screen.getByText("Total Contacts")).toBeInTheDocument();
-    expect(screen.getByText("States Covered")).toBeInTheDocument();
-    expect(screen.getByText("Recent Extractions")).toBeInTheDocument();
-    expect(screen.getByText("Validation Rate")).toBeInTheDocument();
+    expect(screen.getByText("Total Contactos")).toBeInTheDocument();
+    expect(screen.getByText("Estados Cubiertos")).toBeInTheDocument();
+    expect(screen.getByText("Extracciones Recientes")).toBeInTheDocument();
+    expect(screen.getByText("Tasa de Validación")).toBeInTheDocument();
   });
 
   it("displays formatted total contacts", () => {

@@ -5,8 +5,8 @@ import {
 } from "@heroicons/react/24/outline";
 import React from "react";
 import { useAppSelector } from "../../hooks/redux";
-import { MobileSidebar } from "./MobileSidebar";
 import { Icon } from "./Icon";
+import { MobileSidebar } from "./MobileSidebar";
 
 export const Header: React.FC = () => {
   const stats = useAppSelector((state) => state.contacts?.stats);

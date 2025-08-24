@@ -1,8 +1,8 @@
 import {
-    CheckBadgeIcon,
-    DocumentArrowDownIcon,
-    ExclamationTriangleIcon,
-    UserPlusIcon,
+  CheckBadgeIcon,
+  DocumentArrowDownIcon,
+  ExclamationTriangleIcon,
+  UserPlusIcon,
 } from "@heroicons/react/24/outline";
 import { formatDistanceToNow } from "date-fns";
 import React from "react";
@@ -21,37 +21,37 @@ export const RecentActivity: React.FC = () => {
     {
       id: "1",
       type: "extraction",
-      message: "New extraction completed: SINALOA state",
-      timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-      details: "1,500 contacts extracted",
+      message: "Nueva extracción completada: Estado SINALOA",
+      timestamp: new Date(Date.now() - 5 * 60 * 1000),
+      details: "1,500 contactos extraídos",
     },
     {
       id: "2",
       type: "contact_added",
-      message: "Bulk contacts imported",
-      timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
-      details: "2,300 new contacts",
+      message: "Importación masiva de contactos",
+      timestamp: new Date(Date.now() - 15 * 60 * 1000),
+      details: "2,300 nuevos contactos",
     },
     {
       id: "3",
       type: "validation",
-      message: "WhatsApp validation completed",
-      timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-      details: "850 numbers validated",
+      message: "Validación WhatsApp completada",
+      timestamp: new Date(Date.now() - 30 * 60 * 1000),
+      details: "850 números validados",
     },
     {
       id: "4",
       type: "extraction",
-      message: "Export generated: JALISCO municipality",
-      timestamp: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
-      details: "3,200 contacts in XLSX format",
+      message: "Exportación generada: Municipio JALISCO",
+      timestamp: new Date(Date.now() - 45 * 60 * 1000),
+      details: "3,200 contactos en formato XLSX",
     },
     {
       id: "5",
       type: "error",
-      message: "Rate limit reached on Instagram validator",
-      timestamp: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
-      details: "Automatically switched to backup method",
+      message: "Límite de velocidad alcanzado en validador Instagram",
+      timestamp: new Date(Date.now() - 60 * 60 * 1000),
+      details: "Cambio automático a método de respaldo",
     },
   ];
 
@@ -67,78 +67,91 @@ export const RecentActivity: React.FC = () => {
 
   const getActivityColor = (type: Activity["type"]) => {
     const colorMap = {
-      extraction: "text-blue-500 bg-blue-50",
-      contact_added: "text-green-500 bg-green-50",
-      validation: "text-purple-500 bg-purple-50",
-      error: "text-red-500 bg-red-50",
+      extraction: {
+        bg: "bg-blue-500/20",
+        icon: "text-blue-300",
+        border: "border-blue-500/30",
+      },
+      contact_added: {
+        bg: "bg-emerald-500/20",
+        icon: "text-emerald-300",
+        border: "border-emerald-500/30",
+      },
+      validation: {
+        bg: "bg-purple-500/20",
+        icon: "text-purple-300",
+        border: "border-purple-500/30",
+      },
+      error: {
+        bg: "bg-red-500/20",
+        icon: "text-red-300",
+        border: "border-red-500/30",
+      },
     };
     return colorMap[type];
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-        <button className="text-sm text-blue-600 hover:text-blue-500">
-          View all
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-white flex items-center space-x-3">
+          <DocumentArrowDownIcon className="w-6 h-6 text-blue-300" />
+          <span>Actividad Reciente</span>
+        </h3>
+        <button className="text-sm text-purple-300 hover:text-purple-200 transition-colors font-medium">
+          Ver todo
         </button>
       </div>
 
-      <div className="flow-root">
-        <ul className="-mb-8">
-          {activities.map((activity, index) => {
-            const Icon = getActivityIcon(activity.type);
-            const isLast = index === activities.length - 1;
+      <div className="space-y-4">
+        {activities.map((activity) => {
+          const Icon = getActivityIcon(activity.type);
+          const colors = getActivityColor(activity.type);
 
-            return (
-              <li key={activity.id}>
-                <div className="relative pb-8">
-                  {!isLast && (
-                    <span
-                      className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
-                      aria-hidden="true"
-                    />
-                  )}
-                  <div className="relative flex items-start space-x-3">
-                    <div className="relative">
-                      <div
-                        className={`h-10 w-10 rounded-full flex items-center justify-center ring-8 ring-white ${getActivityColor(
-                          activity.type
-                        )}`}
-                      >
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </div>
+          return (
+            <div
+              key={activity.id}
+              className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all duration-300"
+            >
+              <div className="flex items-start space-x-4">
+                <div className={`flex items-center justify-center w-10 h-10 ${colors.bg} ${colors.border} border rounded-xl flex-shrink-0`}>
+                  <Icon className={`w-5 h-5 ${colors.icon}`} />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-white group-hover:text-purple-200 transition-colors">
+                        {activity.message}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        {formatDistanceToNow(activity.timestamp, {
+                          addSuffix: true,
+                        })}
+                      </p>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div>
-                        <div className="text-sm">
-                          <span className="font-medium text-gray-900">
-                            {activity.message}
-                          </span>
-                        </div>
-                        <p className="mt-0.5 text-sm text-gray-500">
-                          {formatDistanceToNow(activity.timestamp, {
-                            addSuffix: true,
-                          })}
-                        </p>
-                      </div>
-                      {activity.details && (
-                        <div className="mt-2 text-sm text-gray-500">
-                          {activity.details}
-                        </div>
-                      )}
+
+                    <div className="flex items-center space-x-1 ml-4">
+                      <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
                     </div>
                   </div>
+
+                  {activity.details && (
+                    <div className="mt-2 text-xs text-slate-300 bg-white/5 rounded-lg px-3 py-2 border border-white/5">
+                      {activity.details}
+                    </div>
+                  )}
                 </div>
-              </li>
-            );
-          })}
-        </ul>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <div className="text-sm text-gray-500 text-center">
-          Auto-refreshes every 30 seconds
+      <div className="mt-6 pt-4 border-t border-white/10">
+        <div className="flex items-center justify-center space-x-2">
+          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+          <span className="text-xs text-slate-300">Actualización automática cada 30 segundos</span>
         </div>
       </div>
     </div>

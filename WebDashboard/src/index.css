@@ -54,21 +54,55 @@ svg {
   flex-grow: 0 !important;
 }
 
-/* Exception for charts */
+/* Exception for charts - more controlled */
 .chart-container svg,
-.chart-container canvas,
-canvas {
-  width: 100% !important;
-  height: 100% !important;
+.chart-container canvas {
+  width: auto !important;
+  height: auto !important;
   max-width: 100% !important;
   max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Prevent canvas from taking full viewport */
+canvas[role="img"] {
+  max-width: 100% !important;
+  max-height: 18rem !important;
+  object-fit: contain !important;
 }
 
 /* Chart container */
 .chart-container {
   position: relative;
-  height: 20rem;
+  height: 18rem;  /* 288px = 18rem, más controlado */
   width: 100%;
+  max-width: 100%;
+  max-height: 18rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Specific chart sizing controls */
+.chart-container > div {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 18rem !important;
+  overflow: hidden !important;
+}
+
+/* Force charts to respect container bounds */
+.chart-container canvas,
+.chart-container svg {
+  position: relative !important;
+  max-width: 100% !important;
+  max-height: 18rem !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
   @keyframes fadeIn {
@@ -86,4 +120,3 @@ canvas {
       opacity: 1;
     }
   }
-}
